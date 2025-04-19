@@ -1,0 +1,122 @@
+{% extends 'farmers/farmer_index.html' %}
+{% load static %}
+
+{% block title %}Transaction History{% endblock title %}
+
+{% block main_content %}
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+      <h2 class="h5 mb-0 fw-bold">All Transactions</h2>
+      <div class="dropdown">
+        <button class="btn btn-outline-success dropdown-toggle btn-sm" type="button" 
+                id="filterDropdown" data-mdb-toggle="dropdown" aria-expanded="false">
+          Filter: {% if status_filter %}{{ status_filter }}{% else %}All{% endif %}
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+          <li><a class="dropdown-item" href="?">All Transactions</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="?status=COMPLETED">Completed</a></li>
+          <li><a class="dropdown-item" href="?status=PENDING">Pending</a></li>
+          <li><a class="dropdown-item" href="?status=FAILED">Failed</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Transaction ID</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Buyer</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for transaction in transactions %}
+            <tr>
+              <td>{{ transaction.transaction_date|date:"d M Y" }}</td>
+              <td>{{ transaction.transaction_id|default:"-" }}</td>
+              <td>{{ transaction.product.name }}</td>
+              <td>{{ transaction.quantity_sold }} {{ transaction.product.unit }}</td>
+              <td>{{ transaction.buyer_name }}</td>
+              <td>₹{{ transaction.total_amount }}</td>
+              <td>
+                <span class="badge 
+                  {% if transaction.payment_status == 'COMPLETED' %}bg-success
+                  {% elif transaction.payment_status == 'PENDING' %}bg-warning
+                  {% elif transaction.payment_status == 'FAILED' %}bg-danger
+                  {% else %}bg-secondary{% endif %}">
+                  {{ transaction.get_payment_status_display }}
+                </span>
+              </td>
+              <td>
+                <a href="{% url 'transaction_detail' transaction.id %}" class="btn btn-sm btn-outline-success">
+                  Details
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center py-4">No transactions found</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% if transactions.has_other_pages %}
+    <div class="card-footer bg-white">
+      <nav aria-label="Transaction pagination">
+        <ul class="pagination justify-content-center mb-0">
+          {% if transactions.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="First">
+              <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ transactions.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% endif %}
+          
+          {% for num in transactions.paginator.page_range %}
+            {% if transactions.number == num %}
+            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+            {% elif num > transactions.number|add:'-3' and num < transactions.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if transactions.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ transactions.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ transactions.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Last">
+              <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+  
+  <div class="text-center mt-3">
+    <a href="{% url 'farmer_profile' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i> Back to Profile
+    </a>
+  </div>
+</div>
+{% endblock main_content %}

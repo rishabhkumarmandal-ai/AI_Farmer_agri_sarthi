@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered agricultural assistant for farmers">
+    <title>AgriSaarthi | {% block title %}{% endblock title %}</title>
+    <link rel="icon" href="{% static 'assets/img/icon.png' %}" type="image/x-icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- MDB CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.css" rel="stylesheet" />
+    
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    
+    <link href="{% static 'assets/css/style.css' %}" rel="stylesheet" />
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-gradient shadow-0">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="fas fa-leaf me-2"></i>
+                AgriSaarthi
+            </a>
+            <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" 
+                data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
+                aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'farmer_homepage' %}">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'farmer_orders' %}">
+                            <i class="fas fa-shopping-basket me-1"></i> Orders
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-money-check-alt me-1"></i> Transaction
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'product_list' %}">
+                            <i class="fas fa-list me-1"></i> Product List
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'upload_page' %}">
+                            <i class="fas fa-upload me-1"></i> Upload
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'community' %}">
+                            <i class="fas fa-message me-1"></i> Community
+                        </a>
+                    </li>
+
+                    
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Profile Button -->
+                    <div class="dropdown">
+                        <a href="{% url 'farmer_profile' %}" class="btn btn-outline-light btn-rounded position-relative hover-scale" 
+                           data-mdb-ripple-color="light">
+                            <i class="fas fa-user-circle me-2"></i> My Profile
+                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
+                                <span class="visually-hidden">Profile</span>
+                            </span>
+                        </a>
+                    </div>
+                    
+                    <!-- Logout Button -->
+                    <div class="dropdown">
+                        <a href="{% url 'logout' %}" class="btn btn-outline-light btn-rounded hover-scale" 
+                           data-mdb-ripple-color="light"
+                           onclick="return confirm('Are you sure you want to logout?');">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                                <span class="visually-hidden">Logout</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                
+                <style>
+                    .btn-rounded {
+                        border-radius: 50px;
+                        padding: 8px 20px;
+                        font-weight: 500;
+                        letter-spacing: 0.5px;
+                        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                        border-width: 1.5px;
+                    }
+                    
+                    .hover-scale:hover {
+                        transform: scale(1.05);
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    }
+                    
+                    .btn-outline-light:hover {
+                        background-color: rgba(255, 255, 255, 0.1);
+                    }
+                    
+                    .gap-3 {
+                        gap: 1rem;
+                    }
+                </style>
+                
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="container my-5">
+        {% block main_content %}{% endblock main_content %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-lg-start mt-5">
+        <div class="container p-4">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">AgriSaarthi</h5>
+                    <p>
+                        AI-powered agricultural assistant helping farmers with crop disease detection, 
+                        community support, and farming best practices.
+                    </p>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Links</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li>
+                            <a href="{% url 'upload_page' %}" class="text-white">Home</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'community' %}" class="text-white">Community</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'admin:index' %}" class="text-white">Admin</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Contact</h5>
+                    <ul class="list-unstyled">
+                        <li>
+                            <i class="fas fa-envelope me-2"></i> info@agrisaarthi.com
+                        </li>
+                        <li>
+                            <i class="fas fa-phone me-2"></i> +91 9876543210
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+            © 2025 AgriSaarthi. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- MDB JS -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
+    
+    <!-- Font Awesome JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+    <script src="{% static 'assets/js/script.js' %}" ></script>
+    {% block extra_js %}  {% endblock extra_js %}
+</body>
+</html>

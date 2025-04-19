@@ -1,0 +1,31 @@
+{% extends 'vendors/vendor_index.html' %}
+{% load static %}
+{% block title %}Payment Form{% endblock %}
+    
+{% block main_content %}
+<div class="container text-center mt-5 min-vh-100 d-flex flex-column">
+    <br>
+    <h2>Enter Payment Details</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Amount (INR):</label>
+        <!-- The amount input will be populated by JavaScript -->
+        <input type="number" name="amount" id="amount" value="" readonly>
+        <button type="submit" class="btn btn-success">Proceed to Pay</button>
+    </form>
+</div>
+
+<script>
+    // Retrieve the grand total from sessionStorage
+    var grandTotal = sessionStorage.getItem('grandTotal');
+
+    if (grandTotal) {
+        // Set the input field value to the grand total retrieved from sessionStorage
+        document.getElementById('amount').value = grandTotal;
+        console.log("Amount set to:", grandTotal);
+    } else {
+        // Handle case where no grandTotal is found in sessionStorage
+        console.log("No total found in sessionStorage.");
+    }
+</script>
+{% endblock %}

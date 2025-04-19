@@ -1,0 +1,109 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}Sign Up{% endblock title %}
+
+{% block main_content %}
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-5" style="width: 100%; max-width: 500px; border-radius: 15px; backdrop-filter: blur(10px); background-color: rgba(255, 255, 255, 0.85);">
+        <div class="card-header bg-gradient text-white py-3">
+            <h3 class="text-center mb-0"><i class="fas fa-user-plus me-2"></i>Create Your Account</h3>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <!-- Username Field -->
+                <div class="form-outline mb-4">
+                    {{ form.username }}
+                    <label class="form-label" for="{{ form.username.id_for_label }}">
+                        <i class="fas fa-user me-2"></i>Username
+                    </label>
+                    <div class="invalid-feedback">
+                        Please choose a username.
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-outline mb-4">
+                    {{ form.password1 }}
+                    <label class="form-label" for="{{ form.password1.id_for_label }}">
+                        <i class="fas fa-lock me-2"></i>Password
+                    </label>
+                    <div class="invalid-feedback">
+                        Please provide a password.
+                    </div>
+                    <div class="form-text">
+                        At least 8 characters with numbers and symbols
+                    </div>
+                </div>
+
+                <!-- Password Confirmation Field -->
+                <div class="form-outline mb-4">
+                    {{ form.password2 }}
+                    <label class="form-label" for="{{ form.password2.id_for_label }}">
+                        <i class="fas fa-lock me-2"></i>Confirm Password
+                    </label>
+                    <div class="invalid-feedback">
+                        Passwords must match.
+                    </div>
+                </div>
+
+                <!-- Terms Checkbox -->
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="termsCheck" required />
+                    <label class="form-check-label" for="termsCheck">
+                        I agree to the <a href="#!" class="text-primary">Terms and Conditions</a>
+                    </label>
+                    <div class="invalid-feedback">
+                        You must agree before submitting.
+                    </div>
+                </div>
+
+                <!-- Sign Up Button -->
+                <button type="submit" class="btn btn-primary btn-lg btn-block mb-4 w-100 rounded-pill">
+                    <i class="fas fa-user-plus me-2"></i>Sign Up
+                </button>
+
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Login Link -->
+                <div class="text-center">
+                    <p class="mb-0">Already have an account? 
+                        <a href="{% url 'login' %}" class="text-primary fw-bold">Login here</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
+{% endblock main_content %}

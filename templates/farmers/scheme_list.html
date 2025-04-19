@@ -1,0 +1,53 @@
+{% extends 'farmers/farmer_index.html' %}
+{% load static %}
+
+{% block title %}Government Schemes{% endblock title %}
+{% block main_content %}
+<div class="container py-5">
+    <div class="card mb-4 p-4 shadow-sm">
+        <h2 class="text-success mb-4 text-center">Search Government Schemes for Farmers</h2>
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <label for="state" class="form-label">Filter by State:</label>
+                <select name="state" id="state" class="form-select">
+                    <option value="">All States</option>
+                    {% for code, name in states %}
+                        <option value="{{ code }}" {% if code == selected_state %}selected{% endif %}>
+                            {{ name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-success w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    {% if schemes %}
+        <div class="row">
+            {% for scheme in schemes %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-success shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-success">{{ scheme.name }}</h5>
+                            <p><strong>State:</strong> {{ scheme.get_state_display }}</p>
+                            <p><strong>Launch Date:</strong> {{ scheme.launch_date }}</p>
+                            {% if scheme.eligibility_criteria %}
+                                <p><strong>Eligibility:</strong> {{ scheme.eligibility_criteria }}</p>
+                            {% endif %}
+                            {% if scheme.benefits %}
+                                <p><strong>Benefits:</strong> {{ scheme.benefits }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center" role="alert">
+            No schemes found for the selected state.
+        </div>
+    {% endif %}
+</div>
+{% endblock main_content %}

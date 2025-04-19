@@ -1,0 +1,48 @@
+{% extends 'vendors/vendor_index.html' %}
+{% load static %}
+{% block title %}Checkout{% endblock %}
+
+{% block main_content %}
+
+<div class="container text-center mt-5 min-vh-100 d-flex flex-column ">
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <br>
+    <h2>Payment Checkout</h2>
+    <p>Order ID: {{ order.order_id }}</p>
+    <p>Amount: ₹{{ order.amount }}</p>
+
+    <button id="pay-btn" class="btn btn-danger btn-lg">Pay with Razorpay</button>
+
+    <script>
+        var options = {
+            "key": "{{ razorpay_key }}",
+            "amount": "{{ order.amount|floatformat:2 }}",
+            "currency": "INR",
+            "name": "AgriSaarthi",
+            "description": "Payment Transaction",
+            "order_id": "{{ order.order_id }}",
+            "handler": function (response){
+                var form = document.createElement("form");
+                form.method = "POST";
+                form.action = "{% url 'payment_success' %}";
+                form.innerHTML += `<input type='hidden' name='razorpay_order_id' value='${response.razorpay_order_id}'>`;
+                form.innerHTML += `<input type='hidden' name='razorpay_payment_id' value='${response.razorpay_payment_id}'>`;
+                form.innerHTML += `<input type='hidden' name='razorpay_signature' value='${response.razorpay_signature}'>`;
+                document.body.appendChild(form);
+                form.submit();
+            },
+            "theme": {
+                "color": "#528FF0"
+            }
+        };
+        var rzp = new Razorpay(options);
+        document.getElementById("pay-btn").onclick = function(e){
+            rzp.open();
+            e.preventDefault();
+        }
+    </script>
+
+</div>
+
+{% endblock %}

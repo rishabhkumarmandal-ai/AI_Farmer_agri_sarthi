@@ -1,0 +1,94 @@
+{% extends 'vendors/vendor_index.html' %}
+{% load static %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block main_content %}
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-3 border-0 rounded-6">
+                <div class="card-body p-5">
+                    <h3 class="mb-4 text-center">
+                        <i class="fas fa-user-edit me-2"></i>Edit Vendor Profile
+                    </h3>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Vendor Name -->
+                        <div class="mb-3">
+                            <label class="form-label">Vendor Name</label>
+                            <input type="text" name="vendor_name" class="form-control" value="{{ vendor.vendor_name }}" required>
+                        </div>
+
+                        <!-- Contact Number -->
+                        <div class="mb-3">
+                            <label class="form-label">Contact Number</label>
+                            <input type="text" name="contact_number" class="form-control" value="{{ vendor.contact_number }}" required>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea name="address" class="form-control" rows="3" required>{{ vendor.address }}</textarea>
+                        </div>
+
+                        <!-- Latitude -->
+                        <div class="mb-3">
+                            <label class="form-label">Latitude</label>
+                            <input type="text" name="latitude" id="latitude" class="form-control" value="{{ vendor.latitude }}">
+                        </div>
+
+                        <!-- Longitude -->
+                        <div class="mb-3">
+                            <label class="form-label">Longitude</label>
+                            <input type="text" name="longitude" id="longitude" class="form-control" value="{{ vendor.longitude }}">
+                        </div>
+
+                        <!-- Live Location Button -->
+                        <div class="mb-3 text-center">
+                            <button type="button" class="btn btn-primary" onclick="getLocation()">
+                                <i class="fas fa-map-marker-alt me-1"></i> Use My Location
+                            </button>
+                        </div>
+
+                        <!-- Profile Image -->
+                        <div class="mb-3">
+                            <label class="form-label">Profile Image</label>
+                            <input type="file" name="profile_image" class="form-control">
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-success px-4">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a href="{% url 'vendor_profile' %}" class="btn btn-secondary px-4">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById('latitude').value = position.coords.latitude;
+            document.getElementById('longitude').value = position.coords.longitude;
+        }, function(error) {
+            alert("Location access denied or unavailable.");
+        });
+    } else {
+        alert("Geolocation not supported by your browser.");
+    }
+}
+</script>
+{% endblock %}

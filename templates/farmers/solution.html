@@ -1,0 +1,149 @@
+{% extends 'farmers/farmer_index.html' %}
+{% load static %}
+
+{% block title %}Disease Solution{% endblock title %}
+
+{% block main_content %}
+<div class="container py-5">
+  <!-- Disease Header -->
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-bold text-success">Solution for <span class="text-decoration-underline">{{ disease_name }}</span></h1>
+    <p class="lead text-muted">Comprehensive treatment and prevention guide</p>
+  </div>
+
+  <!-- Solution Card -->
+  <div class="card shadow-lg">
+    <div class="card-header bg-success text-white py-3">
+      <h2 class="h4 mb-0 fw-bold"><i class="fas fa-leaf me-2"></i> Disease Overview</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <!-- Basic Info Column -->
+        <div class="col-md-6">
+          <div class="disease-info mb-4">
+            <h3 class="h5 fw-bold text-success mb-3"><i class="fas fa-flask me-2"></i>Scientific Details</h3>
+            <div class="ps-4">
+              <p><strong class="text-success">Scientific Name:</strong> {{ scientific_name }}</p>
+              <p><strong class="text-success">Primary Cause:</strong> {{ cause }}</p>
+            </div>
+          </div>
+
+          <div class="symptoms mb-4">
+            <h3 class="h5 fw-bold text-success mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Symptoms</h3>
+            <div class="ps-4">
+              <p>{{ symptoms }}</p>
+            </div>
+          </div>
+
+          <div class="prevention">
+            <h3 class="h5 fw-bold text-success mb-3"><i class="fas fa-shield-alt me-2"></i>Prevention</h3>
+            <div class="ps-4">
+              <p>{{ prevention }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Column -->
+        <div class="col-md-6">
+          <div class="solution-visual bg-light-green p-4 rounded mb-4">
+            <h3 class="h5 fw-bold text-success mb-3"><i class="fas fa-seedling me-2"></i>Organic Solution</h3>
+            <div class="ps-3">
+              <p>{{ organic_solution }}</p>
+            </div>
+          </div>
+
+          <div class="solution-visual bg-light p-4 rounded mb-4">
+            <h3 class="h5 fw-bold text-success mb-3"><i class="fas fa-prescription-bottle-alt me-2"></i>Inorganic Solution</h3>
+            <div class="ps-3">
+              <p>{{ inorganic_solution }}</p>
+            </div>
+          </div>
+
+          <div class="pesticides">
+            <h3 class="h5 fw-bold text-success mb-3"><i class="fas fa-spray-can me-2"></i>Familiar Pesticides</h3>
+            <div class="ps-3">
+              <p>{{ familiar_pesticides }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Remedies -->
+      <div class="additional-remedies mt-4 pt-4 border-top">
+        <h3 class="h5 fw-bold text-success mb-3"><i class="fas fa-lightbulb me-2"></i>Additional Remedies</h3>
+        <div class="ps-3">
+          <p>{{ additional_remedies }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="d-flex justify-content-between mt-4">
+    <button class="btn btn-outline-success" onclick="downloadDiseasePDF()">
+      <i class="fas fa-book me-2"></i> Download Full Guide
+    </button>
+    
+    <a href="#" class="btn btn-success">
+      <i class="fas fa-shopping-cart me-2"></i> Find Recommended Products
+    </a>
+  </div>
+</div>
+
+<style>
+  .bg-light-green {
+    background-color: rgba(200, 230, 200, 0.3);
+  }
+  .disease-info p, .symptoms p, .prevention p, .solution-visual p, .pesticides p, .additional-remedies p {
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+  .card {
+    border: none;
+    border-radius: 15px;
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  async function downloadDiseasePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let y = 20;
+    const lineGap = 10;
+
+    const title = "Disease Solution Guide";
+    doc.setFontSize(18);
+    doc.setTextColor(46, 125, 50); // green
+    doc.text(title, 20, y);
+    y += lineGap * 2;
+
+    const addSection = (label, value) => {
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(14);
+      doc.setTextColor(0);
+      doc.text(`${label}:`, 20, y);
+      y += lineGap;
+      doc.setFontSize(12);
+      doc.text(value || "N/A", 25, y);
+      y += lineGap * 2;
+    };
+
+    addSection("Disease Name", "{{ disease_name }}");
+    addSection("Scientific Name", "{{ scientific_name }}");
+    addSection("Primary Cause", "{{ cause }}");
+    addSection("Symptoms", `{{ symptoms|escapejs }}`);
+    addSection("Prevention", `{{ prevention|escapejs }}`);
+    addSection("Organic Solution", `{{ organic_solution|escapejs }}`);
+    addSection("Inorganic Solution", `{{ inorganic_solution|escapejs }}`);
+    addSection("Familiar Pesticides", `{{ familiar_pesticides|escapejs }}`);
+    addSection("Additional Remedies", `{{ additional_remedies|escapejs }}`);
+
+    doc.save("{{ disease_name|default:'disease'|slugify }}_solution_guide.pdf");
+  }
+</script>
+
+{% endblock main_content %}

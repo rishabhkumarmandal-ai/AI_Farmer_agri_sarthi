@@ -1,0 +1,376 @@
+{% extends 'farmers/farmer_index.html' %}
+{% load static %}
+
+{% block title %}Weather Forecast{% endblock title %}
+
+{% block main_content %}
+<div class="weather-container">
+    <div class="weather-header">
+        <h1><i class="fas fa-cloud-sun-rain"></i> Rainfall Prediction</h1>
+        <p class="subtitle">Get accurate 7-day rainfall forecasts for your location</p>
+    </div>
+
+    <div class="weather-card">
+        <div class="card-content">
+            <div class="location-prompt">
+                <i class="fas fa-map-marker-alt"></i>
+                <p>Allow location access to get personalized weather data</p>
+            </div>
+            
+            <button class="weather-btn" onclick="getLocation()">
+                <i class="fas fa-cloud-rain"></i> Get Rainfall Prediction
+            </button>
+            
+            <div class="loading-spinner" id="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>Fetching weather data...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="weather-info" id="weather-info" style="display: none;">
+        <div class="location-info">
+            <h2 id="location-name"></h2>
+            <div class="current-weather" id="current-weather"></div>
+        </div>
+        
+        <div class="rainfall-summary">
+            <div class="summary-card">
+                <h3>Total Rainfall Prediction</h3>
+                <div class="percentage-display" id="rainfall-percentage"></div>
+                <p class="advice-text" id="rainfall-advice"></p>
+            </div>
+        </div>
+        
+        <div class="forecast-graph">
+            <h3>7-Day Rainfall Forecast</h3>
+            <canvas id="rainfallChart"></canvas>
+        </div>
+        
+        <div class="forecast-details" id="daily-forecast"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const apiKey = "7d9bba6e897f4513a0594619251704";
+    const apiEndpoint = "https://api.weatherapi.com/v1/forecast.json";
+
+    function getLocation() {
+        const spinner = document.getElementById("loading-spinner");
+        spinner.style.display = "block";
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                getWeather,
+                () => {
+                    spinner.style.display = "none";
+                    alert("Could not access your location. Please enable location services.");
+                }
+            );
+        } else {
+            spinner.style.display = "none";
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function getWeather(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        fetch(`${apiEndpoint}?key=${apiKey}&q=${lat},${lon}&days=7`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("loading-spinner").style.display = "none";
+                displayWeatherData(data);
+            })
+            .catch(error => {
+                console.error("Error fetching weather data:", error);
+                document.getElementById("loading-spinner").style.display = "none";
+                alert("Unable to retrieve weather data. Please try again later.");
+            });
+    }
+
+    function displayWeatherData(data) {
+        const location = data.location.name + ", " + data.location.region;
+        const current = data.current;
+        const forecast = data.forecast.forecastday;
+        
+        // Update location and current weather
+        document.getElementById("location-name").textContent = location;
+        
+        const currentWeatherHTML = `
+            <div class="current-conditions">
+                <img src="${current.condition.icon}" alt="${current.condition.text}">
+                <div class="temp">${current.temp_c}°C</div>
+                <div class="condition">${current.condition.text}</div>
+            </div>
+        `;
+        document.getElementById("current-weather").innerHTML = currentWeatherHTML;
+        
+        // Process forecast data
+        const dates = [];
+        const rainfall = [];
+        let totalRainfall = 0;
+        
+        forecast.forEach(day => {
+            dates.push(new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' }));
+            rainfall.push(day.day.totalprecip_mm);
+            totalRainfall += day.day.totalprecip_mm;
+        });
+        
+        // Calculate rainfall probability
+        const maxPossibleRainfall = 7 * 50; // Adjusted max rainfall assumption
+        let rainfallPercentage = (totalRainfall / maxPossibleRainfall) * 100;
+        rainfallPercentage = Math.min(100, rainfallPercentage); // Cap at 100%
+        
+        // Update rainfall percentage display
+        const percentageElement = document.getElementById("rainfall-percentage");
+        percentageElement.innerHTML = `
+            <div class="percentage">${rainfallPercentage.toFixed(0)}<span>%</span></div>
+            <div class="total-rain">Total: ${totalRainfall.toFixed(1)} mm</div>
+        `;
+        
+        // Add advice based on rainfall
+        const adviceElement = document.getElementById("rainfall-advice");
+        if (totalRainfall > 30) {
+            adviceElement.textContent = "Heavy rainfall expected. Consider delaying outdoor work.";
+            adviceElement.style.color = "#e74c3c";
+        } else if (totalRainfall > 15) {
+            adviceElement.textContent = "Moderate rainfall expected. Prepare for wet conditions.";
+            adviceElement.style.color = "#e67e22";
+        } else if (totalRainfall > 5) {
+            adviceElement.textContent = "Light rainfall expected. May affect some farming activities.";
+            adviceElement.style.color = "#f39c12";
+        } else {
+            adviceElement.textContent = "Minimal rainfall expected. Good conditions for outdoor work.";
+            adviceElement.style.color = "#2ecc71";
+        }
+        
+        // Create chart
+        const ctx = document.getElementById("rainfallChart").getContext("2d");
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Rainfall (mm)',
+                    data: rainfall,
+                    backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                    borderColor: 'rgba(41, 128, 185, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Rainfall (mm)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Day'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Show the weather info section
+        document.getElementById("weather-info").style.display = "block";
+    }
+</script>
+
+<style>
+    .weather-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .weather-header {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #2c3e50;
+    }
+    
+    .weather-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        color: #27ae60;
+    }
+    
+    .subtitle {
+        font-size: 1.1rem;
+        color: #7f8c8d;
+    }
+    
+    .weather-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .location-prompt {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        color: #3498db;
+    }
+    
+    .location-prompt i {
+        font-size: 1.5rem;
+        margin-right: 10px;
+    }
+    
+    .weather-btn {
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .weather-btn:hover {
+        background-color: #2ecc71;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+    }
+    
+    .weather-btn i {
+        margin-right: 8px;
+    }
+    
+    .loading-spinner {
+        margin-top: 20px;
+    }
+    
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid #27ae60;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .weather-info {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-top: 20px;
+    }
+    
+    .location-info {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .location-info h2 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+    
+    .current-conditions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .current-conditions img {
+        width: 64px;
+        height: 64px;
+    }
+    
+    .temp {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #e74c3c;
+    }
+    
+    .rainfall-summary {
+        margin: 30px 0;
+    }
+    
+    .summary-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        border-left: 5px solid #3498db;
+    }
+    
+    .percentage-display {
+        margin: 15px 0;
+    }
+    
+    .percentage {
+        font-size: 3.5rem;
+        font-weight: bold;
+        color: #3498db;
+        line-height: 1;
+    }
+    
+    .percentage span {
+        font-size: 1.5rem;
+    }
+    
+    .total-rain {
+        font-size: 1.2rem;
+        color: #7f8c8d;
+    }
+    
+    .advice-text {
+        font-size: 1.1rem;
+        margin-top: 15px;
+        font-weight: 500;
+    }
+    
+    .forecast-graph {
+        margin: 40px 0;
+    }
+    
+    .forecast-graph h3 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .weather-container {
+            padding: 15px;
+        }
+        
+        .weather-header h1 {
+            font-size: 2rem;
+        }
+        
+        .weather-card {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock main_content %}

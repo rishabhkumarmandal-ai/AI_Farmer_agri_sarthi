@@ -1,0 +1,232 @@
+{% extends 'vendors/vendor_index.html' %}
+{% load static %}
+{% block title %}Your Shopping Cart{% endblock %}
+
+{% block main_content %}
+<div class="container py-5">
+    <!-- Page Heading -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-shopping-cart me-2"></i> Your Shopping Cart
+        </h2>
+        <a href="{% url 'vendor_product_list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+        </a>
+    </div>
+
+    {% if cart_items %}
+    <div class="card shadow-2-strong">
+        <div class="card-body">
+            <!-- Cart Items Table -->
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr class="text-uppercase">
+                            <th style="width: 45%">Product</th>
+                            <th style="width: 20%">Price</th>
+                            <th style="width: 20%">Quantity</th>
+                            <th style="width: 15%">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr data-item-id="{{ item.id }}">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover" alt="{{ item.product.name }}">
+                                    {% else %}
+                                    <div class="rounded me-3 bg-light d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-seedling fa-2x text-muted"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <h5 class="mb-1">{{ item.product.name }}</h5>
+                                        <p class="text-muted mb-0"><small>Sold by: {{ item.product.farmer.farm_name }}</small></p>
+                                        <button class="btn btn-sm btn-link text-danger p-0 mt-1 remove-item-btn" data-item-id="{{ item.id }}">
+                                            <i class="fas fa-trash-alt me-1"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                ₹{{ item.product.price_per_unit }}
+                                <br>
+                                <small class="text-muted">per {{ item.product.unit }}</small>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <button class="btn btn-sm btn-outline-secondary px-3 decrease-btn" data-item-id="{{ item.id }}" {% if item.quantity <= 1 %}disabled{% endif %}>
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <span class="mx-2 quantity-display" data-item-id="{{ item.id }}">{{ item.quantity }}</span>
+                                    <button class="btn btn-sm btn-outline-secondary px-3 increase-btn" data-item-id="{{ item.id }}" {% if item.quantity >= item.product.quantity_available %}disabled{% endif %}>
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted d-block mt-1">Max: {{ item.product.quantity_available }} {{ item.product.unit }}</small>
+                            </td>
+                            <td>
+                                <p class="mb-0 fw-bold">₹<span class="item-total" data-item-id="{{ item.id }}">{{ item.total_price }}</span></p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="row mt-4">
+                <div class="col-lg-5 ms-auto">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="mb-3">Cart Summary</h5>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span>₹<span id="subtotal">{{ subtotal }}</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping:</span>
+                                <span>₹<span id="shipping">50.00</span></span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="fw-bold">Total:</span>
+                                <span class="fw-bold">₹<span id="grand-total">{{ total_price }}</span></span>
+                            </div>
+                            
+                            <!-- Proceed to Checkout Button -->
+                            <a href="{% url 'pay' %}?total={{ total_price }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-lock me-2"></i> Proceed to Checkout
+                            </a>
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty Cart -->
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+            <h4>Your cart is empty</h4>
+            <p class="text-muted">Browse our fresh farm products and add items to your cart</p>
+            <a href="{% url 'product_list' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-store me-2"></i> Start Shopping
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    async function updateCartItem(itemId, newQuantity) {
+        try {
+            const response = await fetch(`/cart/update/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ quantity: newQuantity })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                document.querySelector(`.quantity-display[data-item-id="${itemId}"]`).textContent = newQuantity;
+                document.querySelector(`.item-total[data-item-id="${itemId}"]`).textContent = data.item_total;
+                document.getElementById('subtotal').textContent = data.subtotal;
+                document.getElementById('grand-total').textContent = data.grand_total;
+
+                const decBtn = document.querySelector(`.decrease-btn[data-item-id="${itemId}"]`);
+                const incBtn = document.querySelector(`.increase-btn[data-item-id="${itemId}"]`);
+                decBtn.disabled = newQuantity <= 1;
+                incBtn.disabled = newQuantity >= data.max_quantity;
+            } else {
+                throw new Error(data.message || 'Failed to update quantity');
+            }
+        } catch (error) {
+            console.error('Update error:', error);
+            alert('Could not update quantity.');
+        }
+    }
+
+    async function removeCartItem(itemId) {
+        if (!confirm('Are you sure you want to remove this item?')) return;
+
+        try {
+            const response = await fetch(`/cart/remove/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                document.querySelector(`tr[data-item-id="${itemId}"]`).remove();
+                document.getElementById('subtotal').textContent = data.subtotal;
+                document.getElementById('grand-total').textContent = data.grand_total;
+
+                if (data.cart_empty) location.reload();
+            } else {
+                throw new Error(data.message || 'Failed to remove item');
+            }
+        } catch (error) {
+            console.error('Remove error:', error);
+            alert('Could not remove item.');
+        }
+    }
+
+    document.addEventListener('click', function (e) {
+        const target = e.target.closest('.decrease-btn, .increase-btn, .remove-item-btn');
+        if (!target) return;
+
+        const itemId = target.dataset.itemId;
+        const quantityDisplay = document.querySelector(`.quantity-display[data-item-id="${itemId}"]`);
+        const currentQuantity = parseInt(quantityDisplay?.textContent);
+
+        if (target.classList.contains('decrease-btn')) {
+            if (currentQuantity > 1) updateCartItem(itemId, currentQuantity - 1);
+        }
+
+        if (target.classList.contains('increase-btn')) {
+            updateCartItem(itemId, currentQuantity + 1);
+        }
+
+        if (target.classList.contains('remove-item-btn')) {
+            removeCartItem(itemId);
+        }
+
+        target.classList.add('active');
+        setTimeout(() => target.classList.remove('active'), 150);
+    });
+});
+</script>
+
+<style>
+.btn-outline-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-outline-secondary.active {
+    transform: scale(0.95);
+    transition: transform 0.15s ease;
+}
+
+.remove-item-btn:hover {
+    text-decoration: underline;
+}
+</style>
+{% endblock %}

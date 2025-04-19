@@ -1,0 +1,144 @@
+{% extends 'farmers/farmer_index.html' %}
+{% load static %}
+
+{% block title %}Plant Care Solution{% endblock title %}
+
+{% block main_content %}
+<div class="container my-5 animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h2 class="h3 mb-0 text-center"><i class="fas fa-seedling me-2"></i> Plant Care Solution</h2>
+                </div>
+                
+                <div class="card-body">
+                    {% if result %}
+                    <div class="animate__animated animate__fadeInUp">
+                        <div class="d-flex justify-content-end mb-4">
+                            <button id="downloadPdf" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-download me-2"></i>Download Report
+                            </button>
+                        </div>
+                        
+                        <div id="reportContent">
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded">
+                                        <h4 class="h5 text-success"><i class="fas fa-info-circle me-2"></i>Plant Information</h4>
+                                        <p class="mb-1"><strong>Plant:</strong> {{ result.plant }}</p>
+                                        <p><strong>Diagnosis Summary:</strong> {{ result.summary }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded">
+                                        <h4 class="h5 text-success"><i class="fas fa-calendar-check me-2"></i>Quick Tips</h4>
+                                        <ul class="mb-0">
+                                            {% for tip in result.tips|slice:":3" %}
+                                            <li>{{ tip }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h4 class="h5 text-success"><i class="fas fa-clipboard-list me-2"></i>Detailed Care Advice</h4>
+                                <div class="p-3 bg-light rounded">
+                                    {{ result.care_advice|linebreaks }}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h4 class="h5 text-success"><i class="fas fa-lightbulb me-2"></i>Additional Tips</h4>
+                                <ul class="list-group">
+                                    {% for tip in result.tips %}
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <i class="fas fa-check-circle text-success me-3"></i>
+                                        <span>{{ tip }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-danger animate__animated animate__shakeX">
+                        <i class="fas fa-exclamation-circle me-2"></i> {{ error }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'ask_plant_questions' %}" class="btn btn-success rounded-pill px-4 hover-effect">
+                            <i class="fas fa-redo me-2"></i>Diagnose Another Plant
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-light text-center">
+                    <small class="text-muted">For best results, follow the care instructions carefully</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-effect {
+        transition: all 0.3s ease;
+        transform: translateY(0);
+    }
+    .hover-effect:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 128, 0, 0.3);
+    }
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .list-group-item {
+        transition: all 0.2s;
+    }
+    .list-group-item:hover {
+        background-color: rgba(40, 167, 69, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Required libraries -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // PDF Download functionality
+    document.getElementById('downloadPdf').addEventListener('click', function() {
+        const element = document.getElementById('reportContent');
+        const opt = {
+            margin: 10,
+            filename: 'Plant_Care_Solution.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        // Add temporary title for PDF
+        const originalContent = element.innerHTML;
+        const title = '<h2 class="text-center mb-4" style="color: #28a745;"><i class="fas fa-seedling"></i> Plant Care Solution</h2>';
+        element.innerHTML = title + originalContent;
+        
+        // Generate PDF
+        html2pdf().from(element).set(opt).save().then(() => {
+            // Restore original content
+            element.innerHTML = originalContent;
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,325 @@
+{% extends 'farmers/farmer_index.html' %}
+{% load static %}
+
+{% block title %}Farmer Dashboard{% endblock title %}
+
+{% block main_content %}
+<!-- Hero Section -->
+<section class="hero-section bg-light-green py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+
+        <h1 class="display-4 fw-bold mb-4">Sell Your Farm Products Directly</h1>
+        <p class="lead mb-4">Connect with buyers, showcase your harvest, and grow your business with our farmer-friendly platform.</p>
+        <a href="#add-product" class="btn btn-success btn-lg me-2">Add New Product</a>
+        <a href="{% url 'scheme_list'%}" class="btn btn-outline-success btn-lg">View Agriculture Schemes</a>
+      </div>
+      <div class="col-md-6">
+        <img src="{% static 'assets/img/farmer-hero.png' %}" alt="Happy Farmer" class="img-fluid rounded">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-md-3">
+        <h2 class="display-4 text-success fw-bold">1,200+</h2>
+        <p class="lead">Active Buyers</p>
+      </div>
+      <div class="col-md-3">
+        <h2 class="display-4 text-success fw-bold">95%</h2>
+        <p class="lead">Satisfaction Rate</p>
+      </div>
+      <div class="col-md-3">
+        <h2 class="display-4 text-success fw-bold">24h</h2>
+        <p class="lead">Fast Payouts</p>
+      </div>
+      <div class="col-md-3">
+        <h2 class="display-4 text-success fw-bold">0%</h2>
+        <p class="lead">Commission Fee</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Add Product Section -->
+<section id="add-product" class="py-5 bg-light">
+  <div class="container">
+    <h2 class="text-center mb-5 fw-bold">Add New Product</h2>
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-body p-5">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <div class="form-outline">
+                            <input type="text" id="productName" name="name" class="form-control form-control-lg" required />
+                            <label class="form-label" for="productName">Product Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select form-select-lg" name="category" required>
+                            <option selected disabled>Select Category</option>
+                            <option value="1">Vegetables</option>
+                            <option value="2">Fruits</option>
+                            <option value="3">Grains</option>
+                            <option value="4">Dairy</option>
+                        </select>
+                    </div>
+                </div>
+            
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-4 mb-md-0">
+                        <div class="form-outline">
+                            <input type="number" id="price" name="price_per_unit" class="form-control form-control-lg" required />
+                            <label class="form-label" for="price">Price (per kg/unit)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4 mb-md-0">
+                        <div class="form-outline">
+                            <input type="number" id="quantity" name="quantity_available" class="form-control form-control-lg" required />
+                            <label class="form-label" for="quantity">Available Quantity</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select form-select-lg" name="unit" required>
+                            <option selected disabled>Unit</option>
+                            <option value="kg">Kilogram</option>
+                            <option value="g">Gram</option>
+                            <option value="l">Liter</option>
+                            <option value="piece">Piece</option>
+                        </select>
+                    </div>
+                </div>
+            
+                <div class="mb-4">
+                    <div class="form-outline">
+                        <textarea class="form-control form-control-lg" id="description" name="description" rows="4"></textarea>
+                        <label class="form-label" for="description">Product Description</label>
+                    </div>
+                </div>
+            
+                <div class="mb-4">
+                    <label for="productImages" class="form-label">Upload Product Images</label>
+                    <input class="form-control form-control-lg" type="file" id="productImages" name="image" multiple />
+                </div>
+            
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success btn-lg">List Product</button>
+                </div>
+            </form>
+            
+          </div>
+          {% if messages %}
+  <div class="alert-container">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Your Products Section -->
+<section id="your-products" class="py-5 bg-white">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+      <h2 class="fw-bold">Your Products</h2>
+      <div class="dropdown">
+        <button class="btn btn-outline-success dropdown-toggle" type="button" id="sortDropdown" data-mdb-toggle="dropdown" aria-expanded="false">
+          Sort By
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+          <li><a class="dropdown-item" href="#">Newest</a></li>
+          <li><a class="dropdown-item" href="#">Price: Low to High</a></li>
+          <li><a class="dropdown-item" href="#">Price: High to Low</a></li>
+          <li><a class="dropdown-item" href="#">Most Popular</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Product Card 1 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="badge bg-success position-absolute" style="top: 0.5rem; right: 0.5rem">In Stock</div>
+          <img src="{% static 'assets/img/tomato.webp' %}" class="card-img-top" alt="Fresh Tomatoes" style="height: 200px; object-fit: cover">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <h5 class="card-title">Organic Tomatoes</h5>
+              <h5 class="text-success">₹120/kg</h5>
+            </div>
+            <p class="card-text">Freshly harvested organic tomatoes from our farm. Grown without pesticides.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">Available: 50kg</small>
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-success">Edit</button>
+                <button type="button" class="btn btn-sm btn-outline-danger">Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Card 2 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="badge bg-warning position-absolute" style="top: 0.5rem; right: 0.5rem">Low Stock</div>
+          <img src="{% static 'assets/img/apple.webp' %}" class="card-img-top" alt="Fresh Apples" style="height: 200px; object-fit: cover">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <h5 class="card-title">Shimla Apples</h5>
+              <h5 class="text-success">₹180/kg</h5>
+            </div>
+            <p class="card-text">Premium quality Shimla apples from our orchard. Sweet and crispy.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">Available: 8kg</small>
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-success">Edit</button>
+                <button type="button" class="btn btn-sm btn-outline-danger">Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Card 3 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="badge bg-danger position-absolute" style="top: 0.5rem; right: 0.5rem">Out of Stock</div>
+          <img src="{% static 'assets/img/wheat.webp' %}" class="card-img-top" alt="Organic Wheat" style="height: 200px; object-fit: cover">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <h5 class="card-title">Organic Wheat</h5>
+              <h5 class="text-success">₹45/kg</h5>
+            </div>
+            <p class="card-text">High-quality organic wheat grains. Perfect for making healthy flour.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">Available: 0kg</small>
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-success">Edit</button>
+                <button type="button" class="btn btn-sm btn-outline-danger">Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="{% url 'product_list' %}" class="btn btn-success  me-2">View All Products</a>
+    </div>
+  </div>
+</section>
+
+<!-- Orders Section -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="text-center mb-5 fw-bold">Recent Orders</h2>
+    
+    <div class="card shadow-sm">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-success">
+              <tr>
+                <th scope="col">Order ID</th>
+                <th scope="col">Product</th>
+                <th scope="col">Buyer</th>
+                <th scope="col">Qty</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Status</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>#ORD-78945</td>
+                <td>Organic Tomatoes</td>
+                <td>FreshMart Supermarket</td>
+                <td>20kg</td>
+                <td>₹2,400</td>
+                <td><span class="badge bg-success">Completed</span></td>
+                <td><button class="btn btn-sm btn-outline-success">View</button></td>
+              </tr>
+              <tr>
+                <td>#ORD-78944</td>
+                <td>Shimla Apples</td>
+                <td>Nature's Basket</td>
+                <td>15kg</td>
+                <td>₹2,700</td>
+                <td><span class="badge bg-warning">In Transit</span></td>
+                <td><button class="btn btn-sm btn-outline-success">Track</button></td>
+              </tr>
+              <tr>
+                <td>#ORD-78940</td>
+                <td>Organic Wheat</td>
+                <td>Healthy Grains Co.</td>
+                <td>100kg</td>
+                <td>₹4,500</td>
+                <td><span class="badge bg-info">Processing</span></td>
+                <td><button class="btn btn-sm btn-outline-success">Prepare</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tips Section -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <h2 class="text-center mb-5 fw-bold">Selling Tips</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 border-success">
+          <div class="card-body text-center">
+            <div class="mb-3">
+              <i class="fas fa-camera-retro fa-3x text-success"></i>
+            </div>
+            <h5 class="card-title">Quality Photos</h5>
+            <p class="card-text">Use clear, well-lit photos that showcase your products from multiple angles.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-success">
+          <div class="card-body text-center">
+            <div class="mb-3">
+              <i class="fas fa-align-left fa-3x text-success"></i>
+            </div>
+            <h5 class="card-title">Detailed Descriptions</h5>
+            <p class="card-text">Include growing methods, harvest date, and special qualities of your produce.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-success">
+          <div class="card-body text-center">
+            <div class="mb-3">
+              <i class="fas fa-tags fa-3x text-success"></i>
+            </div>
+            <h5 class="card-title">Competitive Pricing</h5>
+            <p class="card-text">Research market prices and consider offering bulk discounts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock main_content %}

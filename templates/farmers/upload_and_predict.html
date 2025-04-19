@@ -1,0 +1,154 @@
+{% extends 'farmers/farmer_index.html' %}
+{% load static %}
+
+{% block title %}Disease Prediction{% endblock title %}
+
+{% block main_content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-5">
+                <!-- Card Header -->
+                <div class="card-header bg-gradient text-white py-3">
+                    <h3 class="card-title text-center mb-0">
+                        <i class="fas fa-cloud-upload-alt me-2"></i>Upload Image for Prediction
+                    </h3>
+                </div>
+                
+                <!-- Card Body -->
+                <div class="card-body p-4">
+                    <!-- Upload Form -->
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Drag and Drop Area -->
+                        <div class="text-center mb-4">
+                            <div id="dropArea" class="border-2 border-dashed rounded-5 p-5" 
+                                 style="background-color: rgba(0, 200, 81, 0.05); cursor: pointer;">
+                                <i class="fas fa-image fa-4x text-primary mb-3"></i>
+                                <p class="mb-3">Drag & drop your image here or</p>
+                                <input type="file" name="file" id="fileElem" 
+                                       class="form-control-file d-none" accept="image/*" required>
+                                <label for="fileElem" class="btn btn-outline-primary">
+                                    <i class="fas fa-folder-open me-2"></i>Browse Files
+                                </label>
+                            </div>
+                            
+                            <!-- Image Preview -->
+                            <div id="imagePreview" class="mt-3 d-none">
+                                <img id="previewImage" class="img-fluid rounded-3 shadow-2" 
+                                     style="max-height: 200px;" alt="Preview">
+                                <button type="button" class="btn btn-sm btn-danger mt-2" 
+                                        onclick="clearPreview()">
+                                    <i class="fas fa-times me-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Form Buttons -->
+                        <div class="d-flex justify-content-center gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4">
+                                <i class="fas fa-search me-2"></i>Predict
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary btn-lg rounded-pill px-4"
+                                    onclick="clearForm()">
+                                <i class="fas fa-undo me-2"></i>Clear
+                            </button>
+
+                            <a href="{% url 'weather'  %}" class="btn btn-outline-secondary btn-lg rounded-pill px-4" >
+                                <i class="fas fa-cloud-sun me-2"></i>Weather
+                            </a>
+
+                            
+                            <a href="{% url 'ask_plant_questions' %}" class="btn btn-outline-secondary btn-lg rounded-pill px-4">
+                                <i class="fas fa-robot me-2"></i> AI Solution
+                              </a>
+                              
+                        </div>
+                    </form>
+                    
+                    <!-- Prediction Results -->
+                    {% if result %}
+                    <div class="mt-4 p-3 bg-light rounded-3">
+                        <h5 class="text-center mb-3">Prediction Results</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <p class="mb-1"><strong>Class:</strong></p>
+                                <a href="javascript:void(0);" id="predicted_class" 
+                                   class="btn btn-outline-success w-100 text-start">
+                                    <i class="fas fa-leaf me-2"></i>{{ result.class }}
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <p class="mb-1"><strong>Confidence:</strong></p>
+                                <div class="progress" style="height: 38px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ result.confidence }}%" 
+                                         aria-valuenow="{{ result.confidence }}" 
+                                         aria-valuemin="0" aria-valuemax="100">
+                                        {{ result.confidence }}%
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'solution' %}?disease_name={{ result.class|urlencode }}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-info-circle me-2"></i>View Solution
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<a href="{% url 'chatbot' %}"  class="chatbot-trigger">
+    <i class="fas fa-robot"></i>
+  </a>
+  
+  
+  <script>
+
+    function clearForm() {
+        // Reset form fields
+        document.querySelector('form').reset();
+
+        // Clear predicted class text
+        const predictedClass = document.getElementById("predicted_class");
+        if (predictedClass) {
+            predictedClass.innerHTML = '<i class="fas fa-leaf me-2"></i>';
+        }
+
+        // Clear confidence progress bar
+        const progressBar = document.querySelector(".progress-bar");
+        if (progressBar) {
+            progressBar.style.width = "0%";
+            progressBar.setAttribute("aria-valuenow", "0");
+            progressBar.innerText = "0%";
+        }
+    }
+  </script>
+
+
+<style>
+    .bg-gradient {
+        background: linear-gradient(135deg, rgba(0,200,81,0.9) 0%, rgba(0,150,136,0.9) 100%) !important;
+    }
+    .border-dashed {
+        border-style: dashed !important;
+    }
+    #dropArea {
+        transition: all 0.3s ease;
+    }
+    #dropArea:hover {
+        background-color: rgba(0, 200, 81, 0.1) !important;
+    }
+   
+</style>
+{% endblock main_content %}

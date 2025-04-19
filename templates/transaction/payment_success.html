@@ -1,0 +1,21 @@
+{% extends 'vendors/vendor_index.html' %}
+{% load static %}
+{% block title %}Payment Success{% endblock %}
+
+{% block main_content %}
+
+<div class="container text-center mt-5  min-vh-100 d-flex flex-column">
+    <br>
+    <h2>Payment Successful!</h2>
+    <p>Payment ID: {{ payment.payment_id }}</p>
+    <p>Order ID: {{ payment.order_id }}</p>
+    <p>Amount Paid: ₹{{ payment.amount }}</p>
+    <p>Status: {{ payment.status }}</p>
+
+    <a href="{{ payment.receipt_pdf.url }}" class="btn btn-primary btn-lg" download>Download Receipt</a>
+    <br>
+    <a href="{% url 'vendor_homepage' %}" class="btn btn-danger ">Continue Shopping</a>
+
+</div>
+
+{% endblock %}

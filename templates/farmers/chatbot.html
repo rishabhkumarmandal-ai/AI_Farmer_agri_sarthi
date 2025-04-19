@@ -1,0 +1,143 @@
+{% extends 'farmers/farmer_index.html' %}
+{% load static %}
+
+{% block title %}Plant Assistant{% endblock title %}
+
+{% block main_content %}
+<div class="container-fluid py-5 chatbot-page">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="chatbot-header text-center mb-4">
+                <h2 class="display-5"><i class="fas fa-leaf text-success me-2"></i>पौधा सहायक (Plant Assistant)</h2>
+                <p class="lead">Get instant help with your plant care questions</p>
+            </div>
+
+            <div class="chatbot-container">
+                <!-- Chat Display Area -->
+                <div class="chat-display p-4 mb-4" id="chatbotMessages">
+                    <div class="bot-message text-start mb-3">
+                        <div class="message-bubble bot-bubble">
+                            <strong>Plant Assistant:</strong> नमस्ते! मैं आपके पौधों से संबंधित किसी भी प्रश्न में आपकी सहायता कर सकता हूँ।<br>
+                            <small>Hello! I can help you with any questions about your plants.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Questions Section -->
+                <div class="quick-questions mb-5">
+                    <h4 class="section-title mb-3">आम सवाल (Common Questions)</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6 col-lg-3">
+                            <button class="question-btn" data-question="What are common plant diseases?">
+                                <div class="btn-icon"><i class="fas fa-bug"></i></div>
+                                <div class="btn-text">सामान्य बीमारियाँ<br><small>Common plant diseases</small></div>
+                            </button>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <button class="question-btn" data-question="How to treat yellow leaves?">
+                                <div class="btn-icon"><i class="fas fa-leaf"></i></div>
+                                <div class="btn-text">पीली पत्तियाँ<br><small>Yellow leaves treatment</small></div>
+                            </button>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <button class="question-btn" data-question="Watering frequency for plants?">
+                                <div class="btn-icon"><i class="fas fa-tint"></i></div>
+                                <div class="btn-text">पानी देने की आवृत्ति<br><small>Watering frequency</small></div>
+                            </button>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <button class="question-btn" data-question="Best fertilizer for plants?">
+                                <div class="btn-icon"><i class="fas fa-seedling"></i></div>
+                                <div class="btn-text">सर्वोत्तम खाद<br><small>Best fertilizer</small></div>
+                            </button>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <button class="question-btn" data-question="How much sunlight do plants need?">
+                                <div class="btn-icon"><i class="fas fa-sun"></i></div>
+                                <div class="btn-text">धूप की आवश्यकता<br><small>Sunlight requirements</small></div>
+                            </button>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <button class="question-btn" data-question="Why are my plants drooping?">
+                                <div class="btn-icon"><i class="fas fa-heart-broken"></i></div>
+                                <div class="btn-text">पौधे झुक क्यों रहे हैं?<br><small>Drooping plants</small></div>
+                            </button>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <button class="question-btn" data-question="Can I use kitchen waste for compost?">
+                                <div class="btn-icon"><i class="fas fa-recycle"></i></div>
+                                <div class="btn-text">रसोई कचरा खाद<br><small>Kitchen waste compost</small></div>
+                            </button>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <button class="question-btn" data-question="How to revive a dying plant?">
+                                <div class="btn-icon"><i class="fas fa-heartbeat"></i></div>
+                                <div class="btn-text">मुरझाए पौधे को बचाएं<br><small>Revive dying plant</small></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features Section -->
+                <div class="features-section mb-5">
+                    <h4 class="section-title mb-3">विशेषताएँ (Features)</h4>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon text-primary">
+                                    <i class="fas fa-language fa-3x"></i>
+                                </div>
+                                <h5>बहुभाषी (Multilingual)</h5>
+                                <p>हिंदी और अंग्रेजी में प्रश्न पूछें (Ask questions in Hindi or English)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon text-success">
+                                    <i class="fas fa-microphone fa-3x"></i>
+                                </div>
+                                <h5>वॉयस इनपुट (Voice Input)</h5>
+                                <p>आवाज में प्रश्न पूछें (Ask questions using your voice)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <div class="feature-icon text-info">
+                                    <i class="fas fa-robot fa-3x"></i>
+                                </div>
+                                <h5>तत्काल उत्तर (Instant Answers)</h5>
+                                <p>पौधों की समस्याओं का तुरंत समाधान (Get instant solutions for plant problems)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Section -->
+                <div class="input-section">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <label class="form-label">भाषा (Language):</label>
+                            <select class="form-select" id="langSelect">
+                                <option value="hi-IN" selected>हिंदी (Hindi)</option>
+                                <option value="en-US">English</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">आवाज़ (Voice):</label>
+                            <select class="form-select" id="genderSelect">
+                                <option value="female">महिला (Female)</option>
+                                <option value="male">पुरुष (Male)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100 voice-btn" id="voiceBtn">
+                                <i class="fas fa-microphone me-2"></i>आवाज़ में पूछें (Ask by Voice)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main_content %}

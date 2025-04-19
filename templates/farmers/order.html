@@ -1,0 +1,71 @@
+{% extends 'farmers/farmer_index.html' %}
+{% load static %}
+
+{% block title %}My Product Orders{% endblock title %}
+
+{% block main_content %}
+<div class="container-fluid px-4">
+    <h2 class="mt-4 mb-4">My Product Orders</h2>
+
+    {% if orders %}
+        {% for order_id, data in orders.items %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Order #{{ data.order.id }}</h5>
+                <span class="badge 
+                    {% if data.order.status == 'Pending' %}bg-warning
+                    {% elif data.order.status == 'Processing' %}bg-info
+                    {% elif data.order.status == 'Shipped' %}bg-primary
+                    {% elif data.order.status == 'Delivered' %}bg-success
+                    {% elif data.order.status == 'Cancelled' %}bg-danger
+                    {% else %}bg-secondary{% endif %}">
+                    {{ data.order.status }}
+                </span>
+            </div>
+            <div class="card-body">
+                <p><strong>Date:</strong> {{ data.order.created_at|date:"Y-m-d H:i" }}</p>
+                {% for item in data.items %}
+                <p><strong>Total Order Amount:</strong> ₹{{ item.total }}</p>
+                {% endfor %}
+                {% if data.order.shipping_address %}
+                    <p><strong>Shipping Address:</strong> {{ data.order.shipping_address }}</p>
+                {% endif %}
+
+                <h5 class="mt-4 mb-3"><i class="fas fa-box me-2"></i>Your Products in this Order</h5>
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.items %}
+                        <tr>
+                            <td>{{ item.product.name }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>₹{{ item.price }}</td>
+                            <td>₹{{ item.total }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-box-open fa-4x text-muted mb-4"></i>
+                <h4 class="mb-3">No Orders Found</h4>
+                <p class="text-muted">You don't have any products in customer orders yet.</p>
+                <a href="{% url 'products' %}" class="btn btn-primary">
+                    <i class="fas fa-store me-2"></i>Back to My Products
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

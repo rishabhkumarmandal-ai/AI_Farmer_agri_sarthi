@@ -1,0 +1,477 @@
+{% extends 'vendors/vendor_index.html' %}
+{% load static %}
+
+{% block title %}Vendor Dashboard{% endblock title %}
+
+{% block main_content %}
+<!-- Vendor Dashboard -->
+<div class="container-fluid px-4">
+    <!-- Welcome Card -->
+    <div class="card mb-4">
+        <div class="card-body bg-primary text-white rounded-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">Welcome, {{ request.user.vendor.business_name }}!</h2>
+                    <p class="mb-0">Today is {% now "F j, Y" %}</p>
+                </div>
+                <img src="{% static 'assets/img/farmers-market.jpg' %}" height="80" alt="Market Illustration">
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start-lg border-start-success h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="icon icon-shape bg-success text-white rounded-3 shadow">
+                                <i class="fas fa-shopping-basket"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">Today's Orders</div>
+                            <div class="h5 fw-bold mb-0">24</div>
+                            <small class="text-success">+5.2% from yesterday</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start-lg border-start-warning h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="icon icon-shape bg-warning text-white rounded-3 shadow">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">Pending Shipments</div>
+                            <div class="h5 fw-bold mb-0">8</div>
+                            <small class="text-warning">2 awaiting confirmation</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start-lg border-start-danger h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="icon icon-shape bg-danger text-white rounded-3 shadow">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">Pending Payments</div>
+                            <div class="h5 fw-bold mb-0">₹12,450</div>
+                            <small class="text-danger">3 invoices overdue</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start-lg border-start-info h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="icon icon-shape bg-info text-white rounded-3 shadow">
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">New Products</div>
+                            <div class="h5 fw-bold mb-0">37</div>
+                            <small class="text-info">12 matching your preferences</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row">
+        <!-- Products Section -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Available Farm Products</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-filter me-1"></i> Filters
+                        </button>
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-search me-1"></i> Advanced Search
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Farmer</th>
+                                    <th>Price</th>
+                                    <th>Available</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{% static 'assets/img/tomato.webp' %}" class="rounded me-3" width="40" height="40">
+                                            <div>
+                                                <h6 class="mb-0">Organic Tomatoes</h6>
+                                                <small class="text-muted">Grade A</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Ramesh Patel</td>
+                                    <td>₹45/kg</td>
+                                    <td>250 kg</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-cart-plus"></i> Add to Order
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{% static 'assets/img/wheat.webp' %}" class="rounded me-3" width="40" height="40">
+                                            <div>
+                                                <h6 class="mb-0">Premium Wheat</h6>
+                                                <small class="text-muted">Grade AA</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Sunita Devi</td>
+                                    <td>₹32/kg</td>
+                                    <td>1,200 kg</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-cart-plus"></i> Add to Order
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{% static 'assets/img/apple.webp' %}" class="rounded me-3" width="40" height="40">
+                                            <div>
+                                                <h6 class="mb-0">Kashmiri Apples</h6>
+                                                <small class="text-muted">Grade A+</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Abdul Khan</td>
+                                    <td>₹120/kg</td>
+                                    <td>350 kg</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-cart-plus"></i> Add to Order
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted">Showing 3 of 27 products</small>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions & Orders -->
+        <div class="col-lg-4 mb-4">
+            <!-- Quick Order Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Quick Order</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary mb-2">
+                            <i class="fas fa-file-invoice-dollar me-2"></i> Create New Order
+                        </button>
+                        <button class="btn btn-outline-secondary mb-2">
+                            <i class="fas fa-file-import me-2"></i> Import Order List
+                        </button>
+                        <button class="btn btn-outline-success">
+                            <i class="fas fa-history me-2"></i> Repeat Previous Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Orders</h5>
+                    <a href="#" class="btn btn-sm btn-link">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between">
+                                <strong>#ORD-2023-1256</strong>
+                                <span class="badge bg-success rounded-pill">Delivered</span>
+                            </div>
+                            <small class="text-muted">Tomatoes, Wheat, Potatoes</small>
+                            <div class="d-flex justify-content-between mt-1">
+                                <small>₹8,450</small>
+                                <small>2 days ago</small>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between">
+                                <strong>#ORD-2023-1255</strong>
+                                <span class="badge bg-warning rounded-pill">Shipped</span>
+                            </div>
+                            <small class="text-muted">Apples, Onions</small>
+                            <div class="d-flex justify-content-between mt-1">
+                                <small>₹12,300</small>
+                                <small>5 days ago</small>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between">
+                                <strong>#ORD-2023-1254</strong>
+                                <span class="badge bg-info rounded-pill">Processing</span>
+                            </div>
+                            <small class="text-muted">Rice, Lentils</small>
+                            <div class="d-flex justify-content-between mt-1">
+                                <small>₹15,750</small>
+                                <small>1 week ago</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Trends Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Current Market Trends</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary">Tomato Prices</h6>
+                            <canvas id="tomatoChart" height="150"></canvas>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small class="text-success">↑ 12% this week</small>
+                                <small>Avg: ₹48/kg</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-success">Wheat Prices</h6>
+                            <canvas id="wheatChart" height="150"></canvas>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small class="text-danger">↓ 3% this week</small>
+                                <small>Avg: ₹30/kg</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-warning">Onion Prices</h6>
+                            <canvas id="onionChart" height="150"></canvas>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small class="text-success">↑ 8% this week</small>
+                                <small>Avg: ₹35/kg</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Farmer Recommendations -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Recommended Farmers</h5>
+            <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <img src="{% static 'assets/img/one.png' %}" class="rounded-circle mb-3" width="80" height="80" alt="Farmer">
+                            <h5 class="card-title mb-1">Ramesh Patel</h5>
+                            <p class="text-muted small">Organic Vegetable Grower</p>
+                            <div class="mb-2">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                                <span class="ms-1">4.5</span>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-sm btn-outline-success">View Products</button>
+                                <button class="btn btn-sm btn-outline-primary">Contact</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <img src="{% static 'assets/img/two.webp' %}" class="rounded-circle mb-3" width="80" height="80" alt="Farmer">
+                            <h5 class="card-title mb-1">Sunita Devi</h5>
+                            <p class="text-muted small">Wheat & Rice Producer</p>
+                            <div class="mb-2">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="far fa-star text-warning"></i>
+                                <span class="ms-1">4.0</span>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-sm btn-outline-success">View Products</button>
+                                <button class="btn btn-sm btn-outline-primary">Contact</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <img src="{% static 'assets/img/three.png' %}" class="rounded-circle mb-3" width="80" height="80" alt="Farmer">
+                            <h5 class="card-title mb-1">Abdul Khan</h5>
+                            <p class="text-muted small">Fruit Orchard Owner</p>
+                            <div class="mb-2">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <span class="ms-1">5.0</span>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-sm btn-outline-success">View Products</button>
+                                <button class="btn btn-sm btn-outline-primary">Contact</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Tomato Price Chart
+    const tomatoCtx = document.getElementById('tomatoChart').getContext('2d');
+    new Chart(tomatoCtx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            datasets: [{
+                label: 'Price/kg',
+                data: [42, 45, 47, 50, 48, 52],
+                borderColor: '#3b71ca',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: false }
+            }
+        }
+    });
+
+    // Wheat Price Chart
+    const wheatCtx = document.getElementById('wheatChart').getContext('2d');
+    new Chart(wheatCtx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            datasets: [{
+                label: 'Price/kg',
+                data: [32, 31, 30, 29, 30, 28],
+                borderColor: '#14a44d',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: false }
+            }
+        }
+    });
+
+    // Onion Price Chart
+    const onionCtx = document.getElementById('onionChart').getContext('2d');
+    new Chart(onionCtx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            datasets: [{
+                label: 'Price/kg',
+                data: [30, 32, 33, 35, 34, 36],
+                borderColor: '#e4a11b',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: false }
+            }
+        }
+    });
+</script>
+{% endblock main_content %}

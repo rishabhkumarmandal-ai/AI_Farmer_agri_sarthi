@@ -1,0 +1,273 @@
+{% extends 'vendors/vendor_index.html' %}
+{% load static %}
+{% block title %}Product List{% endblock title %}
+
+{% block main_content %}
+<div class="container mt-5">
+    <!-- Page Heading -->
+    <h1 class="mb-4 text-center">Farm Fresh Products</h1>
+    
+    <!-- Filter Section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Filter Products</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <!-- Search Field -->
+                <div class="col-md-4">
+                    <div class="form-outline">
+                        <input type="text" class="form-control" name="search" value="{{ search_query }}" 
+                               placeholder="Search products...">
+                        <label class="form-label">Search</label>
+                    </div>
+                </div>
+                
+                <!-- Category Filter -->
+                <div class="col-md-3">
+                    <select class="form-select" name="category">
+                        <option value="">All Categories</option>
+                        {% for value, label in categories.items %}
+                            <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Farmer Filter -->
+                <div class="col-md-3">
+                    <select class="form-select" name="farmer">
+                        <option value="">All Farmers</option>
+                        {% for farmer in farmers %}
+                            <option value="{{ farmer.id }}" {% if selected_farmer == farmer.id|stringformat:"s" %}selected{% endif %}>
+                                {{ farmer.farm_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Price Range -->
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <input type="number" class="form-control" name="min_price" value="{{ min_price }}" 
+                               placeholder="Min price" min="0">
+                        <span class="input-group-text">to</span>
+                        <input type="number" class="form-control" name="max_price" value="{{ max_price }}" 
+                               placeholder="Max price" min="0">
+                    </div>
+                </div>
+                
+                <!-- Filter Buttons -->
+                <div class="col-md-6 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-2"></i> Apply Filters
+                    </button>
+                    <a href="{% url 'vendor_product_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i> Clear Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Products Listing -->
+    <div class="row justify-content-start">
+        {% for product in products %}
+        <div class="col-xl-3 col-lg-4 col-md-6 mb-4 d-flex align-items-stretch">
+            <div class="card shadow-sm w-100">
+                <!-- Product Image -->
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-seedling fa-4x text-muted"></i>
+                </div>
+                {% endif %}
+                
+                <!-- Product Details -->
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ product.name }}</h5>
+                        <span class="badge bg-success rounded-pill">{{ product.get_category_display }}</span>
+                    </div>
+                    
+                    <p class="text-muted small mb-2">
+                        <i class="fas fa-user-tie me-1"></i> {{ product.farmer.farm_name }}
+                    </p>
+                    
+                    <p class="card-text flex-grow-1">{{ product.description|default:"No description available"|truncatechars:100 }}</p>
+                    
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="text-primary mb-0">₹{{ product.price_per_unit }}</h5>
+                                <small class="text-muted">per {{ product.unit }}</small>
+                            </div>
+                            <span class="badge bg-info">
+                                {{ product.quantity_available }} {{ product.unit }} available
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card Footer -->
+                <div class="card-footer bg-white border-top-0 pt-0">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary" data-mdb-toggle="modal" 
+                                data-mdb-target="#productModal{{ product.id }}">
+                            <i class="fas fa-eye me-2"></i> View Details
+                        </button>
+
+                        <form action="{% url 'add_to_cart' product.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success"><i class="fas fa-cart-plus me-2"></i> Add to Cart</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Modal -->
+        <div class="modal fade" id="productModal{{ product.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ product.name }}</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {% if product.image %}
+                                <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}" style="max-height: 400px; object-fit: contain;">
+                                {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-seedling fa-4x text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h4>{{ product.name }}</h4>
+                                    <span class="badge bg-success rounded-pill">{{ product.get_category_display }}</span>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <h6><i class="fas fa-user-tie me-2"></i> Farmer Details</h6>
+                                    <p class="mb-1"><strong>Farm Name:</strong> {{ product.farmer.farm_name }}</p>
+                                    <p class="mb-1"><strong>Contact:</strong> {{ product.farmer.contact_number }}</p>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <h6><i class="fas fa-tag me-2"></i> Pricing</h6>
+                                    <p class="mb-1"><strong>Price:</strong> ₹{{ product.price_per_unit }} per {{ product.unit }}</p>
+                                    <p class="mb-1"><strong>Available Quantity:</strong> {{ product.quantity_available }} {{ product.unit }}</p>
+                                    <p class="mb-1"><strong>Minimum Order:</strong> 1 {{ product.unit }}</p>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <h6><i class="fas fa-info-circle me-2"></i> Description</h6>
+                                    <p>{{ product.description|default:"No description available" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                       
+                            <form action="{% url 'add_to_cart' product.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">Add to Cart</button>
+                            </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-box-open fa-4x text-muted mb-4"></i>
+                    <h4>No products found matching your criteria</h4>
+                    <p class="text-muted">Try adjusting your filters or search term</p>
+                    <a href="{% url 'vendor_product_list' %}" class="btn btn-primary mt-3">
+                        Clear all filters
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    First
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    Previous
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <a class="page-link" href="?page={{ num }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        {{ num }}
+                    </a>
+                </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        {{ num }}
+                    </a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    Next
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    Last
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- MDB Modal initialization -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize all modals
+        var productModals = [].slice.call(document.querySelectorAll('.modal'));
+        productModals.map(function(modalEl) {
+            return new mdb.Modal(modalEl);
+        });
+
+        // Quantity adjustment in modals
+        document.querySelectorAll('.modal').forEach(modal => {
+            const minusBtn = modal.querySelector('.btn-outline-secondary:first-child');
+            const plusBtn = modal.querySelector('.btn-outline-secondary:last-child');
+            const quantityInput = modal.querySelector('input[type="number"]');
+            
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends 'farmers/farmer_index.html' %}
+{% load static %}
+
+{% block title %}Edit Product{% endblock title %}
+
+{% block main_content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h2 class="h5 mb-0 fw-bold text-center">Edit Product</h2>
+        </div>
+        <div class="card-body p-4 p-md-5">
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Current Image Preview -->
+            {% if product.image %}
+            <div class="text-center mb-4">
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded" style="max-height: 200px;">
+              <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="remove_image" name="remove_image">
+                <label class="form-check-label" for="remove_image">Remove current image</label>
+              </div>
+            </div>
+            {% endif %}
+            
+            <!-- Product Name -->
+            <div class="form-outline mb-4">
+              <input type="text" id="name" name="name" class="form-control" value="{{ product.name }}" required />
+              <label class="form-label" for="name">Product Name*</label>
+            </div>
+            
+            <!-- Category and Price -->
+            <div class="row mb-4">
+              <div class="col-md-6 mb-4 mb-md-0">
+                <select class="form-select" name="category" required>
+                    <option value="" disabled selected>Select Category*</option>
+                    <option value="FRUIT">Fruit</option>
+                    <option value="VEGETABLE">Vegetable</option>
+                    <option value="GRAIN">Grain</option>
+                    <option value="PULSE">Pulse</option>
+                    <option value="SPICE">Spice</option>
+                    <option value="DAIRY">Dairy</option>
+                    <option value="HERB">Herb</option>
+                    <option value="TUBER">Tuber</option>
+                    <option value="FLOWER">Flower</option>
+                    <option value="OILSEED">Oilseed</option>
+                    <option value="NUT">Nut</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+              </div>
+              <div class="col-md-6">
+                <div class="form-outline">
+                  <input type="number" step="0.01" id="price_per_unit" name="price_per_unit" 
+                         class="form-control" value="{{ product.price_per_unit }}" required />
+                  <label class="form-label" for="price_per_unit">Price Per Unit*</label>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Quantity and Unit -->
+            <div class="row mb-4">
+              <div class="col-md-6 mb-4 mb-md-0">
+                <div class="form-outline">
+                  <input type="number" id="quantity_available" name="quantity_available" 
+                         class="form-control" value="{{ product.quantity_available }}" required />
+                  <label class="form-label" for="quantity_available">Available Quantity*</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <select class="form-select" name="unit" required>
+                    <option selected disabled>Unit</option>
+                    <option value="kg">Kilogram</option>
+                    <option value="g">Gram</option>
+                    <option value="l">Liter</option>
+                    <option value="piece">Piece</option>
+                
+                </select>
+              </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="form-outline mb-4">
+              <textarea class="form-control" id="description" name="description" rows="3">{{ product.description }}</textarea>
+              <label class="form-label" for="description">Product Description</label>
+            </div>
+            
+            <!-- New Image Upload -->
+            <div class="mb-4">
+              <label for="image" class="form-label">{% if product.image %}Change Product Image{% else %}Add Product Image{% endif %}</label>
+              <input class="form-control" type="file" id="image" name="image" accept="image/*" />
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save me-2"></i> Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <div class="text-center mt-3">
+        <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-2"></i> Back to Products
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock main_content %}

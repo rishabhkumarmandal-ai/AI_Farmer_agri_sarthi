@@ -1,0 +1,77 @@
+{% extends 'farmers/farmer_index.html' %}
+{% load static %}
+
+{% block title %}Plant{% endblock title %}
+
+{% block main_content %}
+<div class="container my-5 animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h2 class="h4 mb-0 text-center">Plant Health Diagnosis</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'plant_solution' %}">
+                        {% csrf_token %}
+                        {% if questions %}
+                            <p class="text-muted mb-4">Please answer these questions about your plant to receive personalized advice:</p>
+                            
+                            {% for question in questions %}
+                            <div class="form-outline mb-4 animate__animated animate__fadeInUp" style="animation-delay: {{ forloop.counter0|add:0.1 }}s">
+                                <label class="form-label" for="q{{ forloop.counter }}">{{ question }}</label>
+                                <input type="text" id="q{{ forloop.counter }}" name="q{{ forloop.counter }}" class="form-control" required>
+                            </div>
+                            {% endfor %}
+                            
+                            <div class="text-center mt-5 animate__animated animate__fadeIn">
+                                <button type="submit" class="btn btn-success btn-lg rounded-pill px-5 hover-effect">
+                                    <i class="fas fa-leaf me-2"></i> Get Plant Advice
+                                </button>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-danger animate__animated animate__shakeX">
+                                <i class="fas fa-exclamation-circle me-2"></i> {{ error }}
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <small class="text-muted">Our AI will analyze your answers to provide the best solution</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-effect {
+        transition: all 0.3s ease;
+        transform: translateY(0);
+    }
+    .hover-effect:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 128, 0, 0.3);
+    }
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Add these in your base template or here -->
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
+<link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    rel="stylesheet"
+/>
+{% endblock %}

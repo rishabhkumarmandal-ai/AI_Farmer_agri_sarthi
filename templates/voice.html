@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plant Assistant Chatbot</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #f8f9fa;
+    }
+
+    .chatbot-wrapper {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+    }
+
+    .chatbot-trigger {
+      background: #28a745;
+      border: none;
+      color: white;
+      padding: 15px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .chatbot-box {
+      width: 320px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      margin-top: 1rem;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chatbot-box.active {
+      display: flex;
+    }
+
+    .chatbot-header {
+      background: #28a745;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chatbot-body {
+      padding: 1rem;
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chatbot-messages {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+
+    .message {
+      padding: 0.5rem;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+      max-width: 90%;
+    }
+
+    .user-message {
+      background: #e9ecef;
+      align-self: flex-end;
+    }
+
+    .bot-message {
+      background: #d4edda;
+      align-self: flex-start;
+    }
+
+    .question-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .question-btn {
+      flex: 1 1 45%;
+      padding: 0.5rem;
+      font-size: 14px;
+      background: #f1f1f1;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .voice-section {
+      margin-top: 1rem;
+    }
+
+    .voice-section button {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 16px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .options {
+      margin-top: 10px;
+    }
+
+    .options select {
+      width: 48%;
+      padding: 0.4rem;
+      font-size: 14px;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Chatbot Section -->
+<div class="chatbot-wrapper">
+  <button id="chatbotButton" class="chatbot-trigger">
+    <i class="fas fa-robot"></i>
+  </button>
+
+  <div id="chatbotContainer" class="chatbot-box">
+    <div class="chatbot-header">
+      <h5><i class="fas fa-leaf me-2"></i>Plant Assistant</h5>
+      <button id="closeBtn" class="chatbot-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="chatbot-body">
+      <div id="chatbotMessages" class="chatbot-messages"></div>
+
+      <div class="chatbot-questions">
+        <h6>Common Questions:</h6>
+        <div class="question-buttons">
+          <button class="question-btn" data-question="What are common plant diseases?">Diseases</button>
+          <button class="question-btn" data-question="How to treat yellow leaves?">Yellow Leaves</button>
+          <button class="question-btn" data-question="Watering frequency for plants?">Watering</button>
+          <button class="question-btn" data-question="Best fertilizer for plants?">Fertilizer</button>
+        </div>
+      </div>
+
+      <div class="options">
+        <label for="langSelect">Language:</label>
+        <select id="langSelect">
+          <option value="en-US">English</option>
+          <option value="es-ES">Spanish</option>
+          <option value="fr-FR">French</option>
+        </select>
+
+        <label for="genderSelect">Voice:</label>
+        <select id="genderSelect">
+          <option value="female">Female</option>
+          <option value="male">Male</option>
+        </select>
+      </div>
+
+      <div class="voice-section">
+        <button id="voiceBtn"><i class="fas fa-microphone"></i> Ask by Voice</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+  const chatbotButton = document.getElementById('chatbotButton');
+  const chatbotContainer = document.getElementById('chatbotContainer');
+  const closeBtn = document.getElementById('closeBtn');
+  const chatbotMessages = document.getElementById('chatbotMessages');
+  const questionButtons = document.querySelectorAll('.question-btn');
+  const voiceBtn = document.getElementById('voiceBtn');
+  const langSelect = document.getElementById('langSelect');
+  const genderSelect = document.getElementById('genderSelect');
+
+  const responses = {
+    "What are common plant diseases?": {
+      en: "Common plant diseases include powdery mildew, leaf spot, blight, and root rot.",
+      es: "Las enfermedades comunes de las plantas incluyen mildiu polvoriento, manchas en las hojas y podredumbre de la raíz.",
+      fr: "Les maladies courantes des plantes comprennent l'oïdium, les taches foliaires et la pourriture des racines."
+    },
+    "How to treat yellow leaves?": {
+      en: "Yellow leaves often mean overwatering or nutrient deficiency. Check soil moisture.",
+      es: "Las hojas amarillas a menudo indican exceso de agua o deficiencia de nutrientes.",
+      fr: "Les feuilles jaunes signifient souvent un excès d'eau ou une carence en nutriments."
+    },
+    "Watering frequency for plants?": {
+      en: "Water when the top inch of soil is dry. It varies by plant type and environment.",
+      es: "Riega cuando la capa superior del suelo esté seca. Depende del tipo de planta.",
+      fr: "Arrosez lorsque le sol est sec sur un centimètre. Cela dépend du type de plante."
+    },
+    "Best fertilizer for plants?": {
+      en: "Use a balanced fertilizer like 10-10-10. Organic compost is also a great choice.",
+      es: "Usa un fertilizante equilibrado como 10-10-10. El compost orgánico también es excelente.",
+      fr: "Utilisez un engrais équilibré comme 10-10-10. Le compost organique est aussi très bon."
+    }
+  };
+
+  // Toggle chatbot
+  chatbotButton.addEventListener('click', () => {
+    chatbotContainer.classList.toggle('active');
+  });
+
+  closeBtn.addEventListener('click', () => {
+    chatbotContainer.classList.remove('active');
+  });
+
+  // Handle question buttons
+  questionButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const question = button.getAttribute('data-question');
+      const userLang = langSelect.value || 'en-US';
+      const langCode = userLang.slice(0, 2); // e.g. "en"
+      const response = responses[question][langCode] || responses[question]['en'];
+
+      addMessage(question, 'user-message');
+      setTimeout(() => {
+        addMessage(response, 'bot-message');
+        speak(response, userLang, genderSelect.value);
+      }, 500);
+    });
+  });
+
+  // Add message
+  function addMessage(text, className) {
+    const msg = document.createElement('div');
+    msg.classList.add('message', className);
+    msg.textContent = text;
+    chatbotMessages.appendChild(msg);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+  }
+
+  // Voice input
+  voiceBtn.addEventListener('click', () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser does not support voice recognition.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = langSelect.value || 'en-US';
+    recognition.start();
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      addMessage(transcript, 'user-message');
+      handleVoiceQuestion(transcript);
+    };
+
+    recognition.onerror = (e) => {
+      addMessage("Voice error: " + e.error, 'bot-message');
+    };
+  });
+
+  function handleVoiceQuestion(question) {
+    const lower = question.toLowerCase();
+    let reply = "Sorry, I don't understand. Please try a plant-related question.";
+    const langCode = langSelect.value.slice(0, 2);
+
+    for (let key in responses) {
+      if (lower.includes(key.toLowerCase().slice(0, 5))) {
+        reply = responses[key][langCode] || responses[key]['en'];
+        break;
+      }
+    }
+
+    setTimeout(() => {
+      addMessage(reply, 'bot-message');
+      speak(reply, langSelect.value, genderSelect.value);
+    }, 500);
+  }
+
+  // Speak response with voice selection
+  function speak(text, lang = 'en-US', gender = 'female') {
+    const synth = window.speechSynthesis;
+    let voices = synth.getVoices();
+
+    if (!voices.length) {
+      synth.onvoiceschanged = () => speak(text, lang, gender);
+      return;
+    }
+
+    let filteredVoices = voices.filter(voice => voice.lang === lang);
+
+    if (gender === 'female') {
+      filteredVoices = filteredVoices.filter(v => /female|zira|woman/i.test(v.name));
+    } else if (gender === 'male') {
+      filteredVoices = filteredVoices.filter(v => /male|david|man/i.test(v.name));
+    }
+
+    const voice = filteredVoices[0] || voices.find(v => v.lang === lang) || voices[0];
+
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.voice = voice;
+    utter.lang = lang;
+    synth.cancel();
+    synth.speak(utter);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+{% extends 'vendors/vendor_index.html' %}
+{% load static %}
+
+{% block title %}Vendor Profile Registration{% endblock title %}
+
+{% block main_content %}
+<div class="container py-5">
+
+    <h2 class="mb-4">Vendor Profile Registration</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Vendor Name -->
+        <div class="mb-3">
+            <label class="form-label">Vendor Name</label>
+            <input type="text" name="vendor_name" class="form-control" required>
+        </div>
+        
+        <!-- Contact Number -->
+        <div class="mb-3">
+            <label class="form-label">Contact Number</label>
+            <input type="text" name="contact_number" class="form-control" required>
+        </div>
+
+        <!-- Address -->
+        <div class="mb-3">
+            <label class="form-label">Address</label>
+            <textarea name="address" class="form-control" required></textarea>
+        </div>
+
+        <!-- Latitude and Longitude -->
+        <div class="mb-3">
+            <label class="form-label">Latitude</label>
+            <input type="text" id="latitude" name="latitude" class="form-control" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Longitude</label>
+            <input type="text" id="longitude" name="longitude" class="form-control" readonly>
+        </div>
+
+        <!-- Button to get live location -->
+        <button type="button" class="btn btn-primary" onclick="getLocation()">Use My Location</button>
+
+        <!-- Profile Image -->
+        <div class="mb-3">
+            <label class="form-label">Profile Image</label>
+            <input type="file" name="profile_image" class="form-control">
+        </div>
+
+        <!-- Submit and Cancel buttons -->
+        <button type="submit" class="btn btn-success">Register</button>
+        <a href="#" class="btn btn-secondary">Cancel</a>
+    </form>
+
+</div>
+
+<script>
+// Function to get live location
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById('latitude').value = position.coords.latitude;
+            document.getElementById('longitude').value = position.coords.longitude;
+        }, function(error) {
+            alert("Unable to retrieve your location. Please try again.");
+        });
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+}
+</script>
+
+{% endblock main_content %}
